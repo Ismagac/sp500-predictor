@@ -41,10 +41,10 @@ Para que funcione el modelo desde S3, necesitas:
 
 ### Ejemplo de configuración en .env:
 ```env
-AWS_ACCESS_KEY_ID=AKIA5SQ424JVENP5TPVZ
-AWS_SECRET_ACCESS_KEY=7Pa9A84N0Uwg/xB8sUPkzQla6cqTxakcVxTZE8F3
-S3_BUCKET_NAME=sp500-technical-analysis-ismaelgc
-S3_MODEL_KEY=models/sp500_xgb_model.joblib
+AWS_ACCESS_KEY_ID=EXAMPLE_AWS_KEY_123
+AWS_SECRET_ACCESS_KEY=EXAMPLE_AWS_SECRET_456
+S3_BUCKET_NAME=example-sp500-models
+S3_MODEL_KEY=models/xgboost_sp500_model.pkl
 ```
 
 ### Estructura S3:
