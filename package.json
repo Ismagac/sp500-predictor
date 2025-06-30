@@ -7,10 +7,10 @@
   "keywords": ["sp500", "prediction", "machine-learning", "react", "typescript", "fastapi"],
   "author": "Tu Nombre",
   "license": "MIT",
-  "homepage": "https://tuusuario.github.io/sp500-predictor",
+  "homepage": "https://Ismagac.github.io/sp500-predictor",
   "repository": {
     "type": "git",
-    "url": "https://github.com/tuusuario/sp500-predictor.git"
+    "url": "https://github.com/Ismagac/sp500-predictor.git"
   },
   "scripts": {
     "dev": "vite",
