@@ -1,0 +1,26 @@
+# Ignore frontend files
+../package.json
+../package-lock.json
+../node_modules/
+../dist/
+../src/
+../public/
+../.github/
+../vite.config.ts
+../tailwind.config.js
+../postcss.config.js
+../tsconfig*.json
+../eslint.config.js
+../*.md
+../*.sh
+../*.bat
+../*.ps1
+
+# Keep only backend files
+!requirements.txt
+!main.py
+!*.py
+!.env.example
+!Procfile
+!railway.json
+!nixpacks.toml
