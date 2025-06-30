@@ -1,44 +1,39 @@
-name: Deploy to GitHub Pages
+name: Build and Deploy to GitHub Pages
 
 on:
   push:
     branches: [ main ]
 
-# Grant GITHUB_TOKEN the permissions required to make a Pages deployment  
 permissions:
-  contents: read
+  contents: write
   pages: write
   id-token: write
 
 jobs:
   build-and-deploy:
     runs-on: ubuntu-latest
-    
     steps:
-    - name: Checkout
+    - name: Checkout 🛎️
       uses: actions/checkout@v4
-      
-    - name: Setup Node.js
+
+    - name: Setup Node.js 🔧
       uses: actions/setup-node@v4
       with:
-        node-version: '20.19.0'
+        node-version: '20'
         cache: 'npm'
-        
-    - name: Clean install
-      run: |
-        rm -rf node_modules package-lock.json
-        npm install --force
-        
-    - name: Build
+
+    - name: Install dependencies 📦
+      run: npm ci --legacy-peer-deps
+
+    - name: Build 🏗️
       run: npm run build
       env:
-        VITE_API_URL: ${{ secrets.VITE_API_URL || 'https://sp500-predictor-production.up.railway.app' }}
-        VITE_POLYGON_API_KEY: ${{ secrets.VITE_POLYGON_API_KEY || '' }}
-        
-    - name: Deploy to GitHub Pages
-      if: github.ref == 'refs/heads/main'
-      uses: peaceiris/actions-gh-pages@v3
+        VITE_API_URL: 'https://sp500-predictor-production.up.railway.app'
+        VITE_POLYGON_API_KEY: ''
+
+    - name: Deploy 🚀
+      uses: JamesIves/github-pages-deploy-action@v4.6.8
       with:
-        github_token: ${{ secrets.GITHUB_TOKEN }}
-        publish_dir: ./dist
-        force_orphan: true
+        branch: gh-pages
+        folder: dist
+        clean: true

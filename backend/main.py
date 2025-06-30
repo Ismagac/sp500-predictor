@@ -6,6 +6,7 @@ from typing import Optional, List, Dict
 import logging
 import os
 import sys
+import socket
 from datetime import datetime, timedelta
 
 from model_service import model_service
@@ -54,10 +55,30 @@ class MarketDataResponse(BaseModel):
     changePercent: float
     timestamp: str
 
-# Endpoint raíz
+# Endpoint raíz con información de diagnóstico
 @app.get("/")
 async def root():
-    return {"message": "SP500 Prediction API", "status": "online"}
+    """Endpoint raíz con información de diagnóstico para Railway"""
+    import socket
+    hostname = socket.gethostname()
+    local_ip = socket.gethostbyname(hostname)
+    
+    return {
+        "message": "SP500 Prediction API", 
+        "status": "online",
+        "timestamp": datetime.now().isoformat(),
+        "host": os.getenv("HOST", "0.0.0.0"),
+        "port": os.getenv("PORT", "8000"),
+        "hostname": hostname,
+        "local_ip": local_ip,
+        "python_version": f"{sys.version_info.major}.{sys.version_info.minor}.{sys.version_info.micro}",
+        "environment": "production" if not os.getenv("DEBUG", "false").lower() == "true" else "development",
+        "endpoints": {
+            "health": "/health",
+            "market_current": "/api/market/current", 
+            "prediction": "/api/prediction"
+        }
+    }
 
 # Endpoint de salud
 @app.get("/health")
