@@ -1,45 +1,86 @@
-# Railway Configuration Summary
+# Railway Configuration Summary - FIXED
 
-## Backend Configuration Status ✅
+## ✅ Backend Configuration Status FIXED - Issue Resolved
 
-Railway está configurado para usar el **backend principal completo** (`main.py`) con todas las funcionalidades.
+Railway estaba fallando debido a que la variable `$PORT` no se expandía correctamente en el comando de inicio. **PROBLEMA SOLUCIONADO**.
 
-### Archivos de Configuración
+### 🚨 Issue Identificado y Solucionado
 
-#### 1. `Procfile` - Railway Start Command
+**Problema anterior:**
+```bash
+Error: Invalid value for '--port': '$PORT' is not a valid integer.
 ```
-web: python -m uvicorn main:app --host 0.0.0.0 --port $PORT
+
+**Causa:** Railway no expandía la variable `$PORT` en comandos como:
+```bash
+python -m uvicorn main:app --host 0.0.0.0 --port $PORT
 ```
 
-#### 2. `railway.json` - Railway Deploy Configuration
+**Solución aplicada:** Script de inicio dedicado que maneja la variable PORT en Python.
+
+### 🔧 Solución Implementada
+
+#### 1. Nuevo Script de Inicio: `start_server.py`
+```python
+#!/usr/bin/env python3
+import os
+import uvicorn
+
+if __name__ == "__main__":
+    port = int(os.getenv("PORT", 8000))
+    host = os.getenv("HOST", "0.0.0.0")
+    
+    print(f"Starting server on {host}:{port}")
+    
+    uvicorn.run(
+        "main:app",
+        host=host,
+        port=port,
+        log_level="info"
+    )
+```
+
+#### 2. Archivos de Configuración Actualizados
+
+**`Procfile`:**
+```
+web: python start_server.py
+```
+
+**`railway.json`:**
 ```json
 {
-  "build": {
-    "builder": "NIXPACKS"
-  },
   "deploy": {
-    "startCommand": "python -m uvicorn main:app --host 0.0.0.0 --port $PORT",
-    "restartPolicyType": "ON_FAILURE",
-    "restartPolicyMaxRetries": 3
+    "startCommand": "python start_server.py"
   }
 }
 ```
 
-#### 3. `nixpacks.toml` - Build Configuration
+**`nixpacks.toml`:**
 ```toml
 [start]
-cmd = "python -m uvicorn main:app --host 0.0.0.0 --port $PORT"
+cmd = "python start_server.py"
 ```
 
-#### 4. `.railwayignore` - Exclude Simple Files
-Los archivos simples están excluidos del despliegue:
-- `simple_main.py`
-- `test_main.py` 
-- `requirements-simple.txt`
-- `requirements-minimal.txt`
-- `railway-simple.json`
-- `nixpacks-simple.toml`
-- `Procfile.simple`
+### 🌐 CORS Fix Aplicado
+
+También se corrigieron los orígenes CORS para incluir el dominio correcto de GitHub Pages:
+
+```python
+allowed_origins = [
+    "http://localhost:5177",
+    "http://localhost:3000", 
+    "http://localhost:5173",
+    "https://ismagac.github.io",           # ✅ Correcto
+    "https://ismagac.github.io/sp500-predictor",  # ✅ Con ruta
+    "https://*.github.io",
+    "https://github.io"
+]
+
+# En producción, permitir todos los orígenes
+if not os.getenv("DEBUG", "false").lower() == "true":
+    allowed_origins = ["*"]
+```
 
 ### Backend Principal (`main.py`) Features
 
