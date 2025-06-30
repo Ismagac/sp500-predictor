@@ -4,23 +4,15 @@ on:
   push:
     branches: [ main ]
 
-# Grant GITHUB_TOKEN the permissions required to make a Pages deployment
+# Grant GITHUB_TOKEN the permissions required to make a Pages deployment  
 permissions:
   contents: read
   pages: write
   id-token: write
 
-# Allow one concurrent deployment
-concurrency:
-  group: "pages"
-  cancel-in-progress: true
-
 jobs:
   build-and-deploy:
     runs-on: ubuntu-latest
-    environment:
-      name: github-pages
-      url: ${{ steps.deployment.outputs.page_url }}
     
     steps:
     - name: Checkout
@@ -40,17 +32,13 @@ jobs:
     - name: Build
       run: npm run build
       env:
-        VITE_API_URL: ${{ secrets.VITE_API_URL }}
-        VITE_POLYGON_API_KEY: ${{ secrets.VITE_POLYGON_API_KEY }}
-        
-    - name: Setup Pages
-      uses: actions/configure-pages@v3
-      
-    - name: Upload artifact
-      uses: actions/upload-pages-artifact@v2
-      with:
-        path: './dist'
+        VITE_API_URL: ${{ secrets.VITE_API_URL || 'https://sp500-predictor-production.up.railway.app' }}
+        VITE_POLYGON_API_KEY: ${{ secrets.VITE_POLYGON_API_KEY || '' }}
         
     - name: Deploy to GitHub Pages
-      id: deployment
-      uses: actions/deploy-pages@v2
+      if: github.ref == 'refs/heads/main'
+      uses: peaceiris/actions-gh-pages@v3
+      with:
+        github_token: ${{ secrets.GITHUB_TOKEN }}
+        publish_dir: ./dist
+        force_orphan: true

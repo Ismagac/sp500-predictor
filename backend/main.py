@@ -5,6 +5,7 @@ from pydantic import BaseModel
 from typing import Optional, List, Dict
 import logging
 import os
+import sys
 from datetime import datetime, timedelta
 
 from model_service import model_service
@@ -61,12 +62,17 @@ async def root():
 # Endpoint de salud
 @app.get("/health")
 async def health_check():
-    return {
+    health_info = {
         "status": "healthy", 
         "timestamp": datetime.now().isoformat(),
         "port": os.getenv("PORT", "8000"),
-        "host": os.getenv("HOST", "0.0.0.0")
+        "host": os.getenv("HOST", "0.0.0.0"),
+        "python_version": f"{sys.version_info.major}.{sys.version_info.minor}.{sys.version_info.micro}",
+        "environment": "production" if not os.getenv("DEBUG", "false").lower() == "true" else "development"
     }
+    
+    logger.info(f"Health check accessed: {health_info}")
+    return health_info
 
 # Devuelve los datos actuales del mercado SP500
 @app.get("/api/market/current", response_model=MarketDataResponse)
@@ -265,12 +271,17 @@ async def startup_event():
     """Cargar modelo al iniciar"""
     logger.info("Iniciando API de Predicción SP500...")
     
-    # Pre-cargar el modelo
-    success = await model_service.load_model()
-    if success:
-        logger.info("Modelo cargado exitosamente")
-    else:
-        logger.warning("Error al cargar el modelo - se utilizará un fallback")
+    # Pre-cargar el modelo (sin fallar si no se puede cargar)
+    try:
+        success = await model_service.load_model()
+        if success:
+            logger.info("Modelo cargado exitosamente")
+        else:
+            logger.warning("Error al cargar el modelo - se utilizará un fallback")
+    except Exception as e:
+        logger.warning(f"No se pudo cargar el modelo en startup: {str(e)} - continuando con fallback")
+    
+    logger.info("API de Predicción SP500 iniciada correctamente")
 
 if __name__ == "__main__":
     import uvicorn
