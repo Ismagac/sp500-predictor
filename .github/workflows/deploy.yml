@@ -22,14 +22,18 @@ jobs:
         node-version: '20'
         cache: 'npm'
 
-    - name: Install dependencies 📦
-      run: npm ci --legacy-peer-deps
+    - name: Clean install dependencies 📦
+      run: |
+        rm -rf node_modules package-lock.json
+        npm cache clean --force
+        npm install --legacy-peer-deps --force
 
     - name: Build 🏗️
       run: npm run build
       env:
         VITE_API_URL: 'https://sp500-predictor-production.up.railway.app'
         VITE_POLYGON_API_KEY: ''
+        NODE_OPTIONS: '--max-old-space-size=4096'
 
     - name: Deploy 🚀
       uses: JamesIves/github-pages-deploy-action@v4.6.8
