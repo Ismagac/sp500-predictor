@@ -28,9 +28,10 @@ allowed_origins = [
     "http://localhost:3000", 
     "http://localhost:5173",
     "https://turbo-sp500.onrender.com",
+    "https://ismagac.github.io",
+    "https://ismagac.github.io/sp500-predictor",
     "https://*.github.io",
-    "https://github.io",
-    "https://ismae1-ai.github.io"
+    "https://github.io"
 ]
 
 # En producción, permitir todos los orígenes (Railway no es tan específico)
