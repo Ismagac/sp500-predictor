@@ -54,13 +54,24 @@ async def test():
         "timestamp": datetime.now().isoformat()
     }
 
-# Para Railway
+# Para Railway - auto start
 if __name__ == "__main__":
     import uvicorn
     port = int(os.getenv("PORT", 8000))
     print(f"🚀 Iniciando servidor en puerto {port}")
     uvicorn.run(
         "simple_main:app",
+        host="0.0.0.0",
+        port=port,
+        log_level="info"
+    )
+else:
+    # Para Railway cuando importa el módulo
+    import uvicorn
+    port = int(os.getenv("PORT", 8000))
+    print(f"🚀 Railway: Iniciando servidor en puerto {port}")
+    uvicorn.run(
+        app,
         host="0.0.0.0",
         port=port,
         log_level="info"

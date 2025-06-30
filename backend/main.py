@@ -23,9 +23,23 @@ app = FastAPI(
 )
 
 # Configuración de CORS
+allowed_origins = [
+    "http://localhost:5177",
+    "http://localhost:3000", 
+    "http://localhost:5173",
+    "https://turbo-sp500.onrender.com",
+    "https://*.github.io",
+    "https://github.io",
+    "https://ismae1-ai.github.io"
+]
+
+# En producción, permitir todos los orígenes (Railway no es tan específico)
+if not os.getenv("DEBUG", "false").lower() == "true":
+    allowed_origins = ["*"]
+
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["http://localhost:5177", "http://localhost:3000", "http://localhost:5173"],
+    allow_origins=allowed_origins,
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],

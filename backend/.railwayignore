@@ -24,3 +24,17 @@
 !Procfile
 !railway.json
 !nixpacks.toml
+
+# Simple/alternative files - Railway should use main.py
+simple_main.py
+test_main.py
+requirements-simple.txt
+requirements-minimal.txt
+railway-simple.json
+nixpacks-simple.toml
+Procfile.simple
+
+# Test and debug files
+test_*.py
+*_test.py
+debug_*.py
