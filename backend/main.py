@@ -302,6 +302,51 @@ async def debug_model():
         logger.error(f"Depuración: Error en prueba de modelo: {str(e)}")
         return {"success": False, "error": str(e)}
 
+# Endpoint de diagnóstico específico para Railway
+@app.get("/railway-debug")
+async def railway_debug():
+    """Endpoint especial para diagnosticar problemas de Railway"""
+    import socket
+    hostname = socket.gethostname()
+    
+    try:
+        local_ip = socket.gethostbyname(hostname)
+    except:
+        local_ip = "unknown"
+    
+    # Obtener todas las variables de entorno relevantes
+    env_vars = {
+        "PORT": os.getenv("PORT", "not set"),
+        "HOST": os.getenv("HOST", "not set"),
+        "DEBUG": os.getenv("DEBUG", "not set"),
+        "RAILWAY_ENVIRONMENT": os.getenv("RAILWAY_ENVIRONMENT", "not set"),
+        "RAILWAY_SERVICE_NAME": os.getenv("RAILWAY_SERVICE_NAME", "not set"),
+        "RAILWAY_PROJECT_NAME": os.getenv("RAILWAY_PROJECT_NAME", "not set"),
+    }
+    
+    return {
+        "message": "Railway Debug Info",
+        "status": "online",
+        "timestamp": datetime.now().isoformat(),
+        "hostname": hostname,
+        "local_ip": local_ip,
+        "python_version": f"{sys.version_info.major}.{sys.version_info.minor}.{sys.version_info.micro}",
+        "working_directory": os.getcwd(),
+        "environment_variables": env_vars,
+        "cors_origins": app.middleware[0].kwargs.get('allow_origins', []) if app.middleware else [],
+        "endpoints": [
+            "/",
+            "/health", 
+            "/railway-debug",
+            "/api/market/current",
+            "/api/prediction",
+            "/api/market/historical",
+            "/debug/market-data",
+            "/debug/features", 
+            "/debug/model"
+        ]
+    }
+
 @app.on_event("startup")
 async def startup_event():
     """Cargar modelo al iniciar"""

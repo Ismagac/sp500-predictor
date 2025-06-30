@@ -157,34 +157,48 @@ El modelo espera un archivo `.pkl` en S3 con las siguientes características:
 
 ## 🌐 Despliegue
 
-### Frontend (GitHub Pages)
+### ✅ Frontend (GitHub Pages) - FUNCIONANDO
 ```bash
-# Configurar variables de producción en .env.production
-VITE_API_URL=https://tu-backend-desplegado.railway.app
+# El frontend está desplegado automáticamente en:
+# https://ismagac.github.io/sp500-predictor
 
-# Desplegar automáticamente
-npm run deploy
-
-# El sitio estará disponible en:
-# https://tuusuario.github.io/sp500-predictor
+# Se actualiza automáticamente con cada push a main
 ```
 
-### Backend (Railway/Heroku)
-Ver [DEPLOYMENT.md](DEPLOYMENT.md) para instrucciones detalladas de despliegue del backend.
+### ✅ Backend (Railway) - FUNCIONANDO
+```bash
+# El backend está desplegado en:
+# https://sp500-predictor-production.up.railway.app
 
-**Plataformas recomendadas:**
-- **Railway** (fácil y rápido)
-- **Heroku** (gratuito con limitaciones)
-- **DigitalOcean App Platform**
-- **AWS ECS**
+# Estado: ✅ ONLINE
+# Endpoints disponibles:
+# - GET / (info diagnóstico)
+# - GET /health (estado del servidor)
+# - GET /api/market/current (datos actuales SP500)
+# - GET /api/prediction (predicción XGBoost)
+```
 
-## 🚨 Solución CORS
+### 🔧 Configuración de Variables de Entorno en Railway
 
-El acceso directo a S3 desde el frontend está bloqueado por CORS. Por eso se implementó un backend que:
-1. Carga el modelo XGBoost desde S3
-2. Obtiene datos de mercado en tiempo real
-3. Calcula indicadores técnicos
-4. Retorna predicciones vía API REST
+Para obtener predicciones del modelo XGBoost real, configura en Railway:
+
+1. Ve a tu proyecto en Railway
+2. Sección "Variables" 
+3. Añade estas variables:
+
+```env
+# AWS S3 para modelo XGBoost (opcional - hay fallback)
+AWS_ACCESS_KEY_ID=tu_aws_access_key
+AWS_SECRET_ACCESS_KEY=tu_aws_secret_key
+S3_BUCKET_NAME=sp500-models
+S3_MODEL_KEY=xgboost_sp500_model.pkl
+
+# Configuración de entorno
+DEBUG=false
+HOST=0.0.0.0
+```
+
+**Nota:** El sistema funciona sin AWS S3 usando un modelo de fallback inteligente basado en indicadores técnicos reales.
 
 ## 🎨 Diseño
 
