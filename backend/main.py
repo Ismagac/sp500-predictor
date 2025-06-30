@@ -4,6 +4,7 @@ from fastapi.responses import JSONResponse
 from pydantic import BaseModel
 from typing import Optional, List, Dict
 import logging
+import os
 from datetime import datetime, timedelta
 
 from model_service import model_service
@@ -60,7 +61,12 @@ async def root():
 # Endpoint de salud
 @app.get("/health")
 async def health_check():
-    return {"status": "healthy", "timestamp": datetime.now().isoformat()}
+    return {
+        "status": "healthy", 
+        "timestamp": datetime.now().isoformat(),
+        "port": os.getenv("PORT", "8000"),
+        "host": os.getenv("HOST", "0.0.0.0")
+    }
 
 # Devuelve los datos actuales del mercado SP500
 @app.get("/api/market/current", response_model=MarketDataResponse)
