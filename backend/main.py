@@ -1,4 +1,4 @@
-from fastapi import FastAPI, HTTPException
+from fastapi import FastAPI, HTTPException, Request
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
 from pydantic import BaseModel
@@ -22,27 +22,41 @@ app = FastAPI(
     version="1.0.0"
 )
 
+# Middleware de logging para debug
+@app.middleware("http")
+async def log_requests(request: Request, call_next):
+    start_time = datetime.now()
+    logger.info(f"🔍 Incoming request: {request.method} {request.url}")
+    logger.info(f"🔍 Headers: {dict(request.headers)}")
+    
+    response = await call_next(request)
+    
+    process_time = (datetime.now() - start_time).total_seconds()
+    logger.info(f"✅ Response: {response.status_code} - {process_time:.3f}s")
+    
+    return response
+
 # Configuración de CORS
 allowed_origins = [
     "http://localhost:5177",
     "http://localhost:3000", 
     "http://localhost:5173",
-    "https://turbo-sp500.onrender.com",
     "https://ismagac.github.io",
-    "https://ismagac.github.io/sp500-predictor",
-    "https://*.github.io",
-    "https://github.io"
+    "https://ismagac.github.io/sp500-predictor"
 ]
 
-# En producción, permitir todos los orígenes (Railway no es tan específico)
-if not os.getenv("DEBUG", "false").lower() == "true":
+# En Railway, permitir todos los orígenes para evitar problemas CORS
+if os.getenv("RAILWAY_ENVIRONMENT") or not os.getenv("DEBUG", "false").lower() == "true":
     allowed_origins = ["*"]
+    logger.info("CORS configured for Railway production - allowing all origins")
+
+logger.info(f"CORS allowed origins: {allowed_origins}")
 
 app.add_middleware(
     CORSMiddleware,
     allow_origins=allowed_origins,
-    allow_credentials=True,
-    allow_methods=["*"],
+    allow_credentials=False if "*" in allowed_origins else True,
+    allow_methods=["GET", "POST", "PUT", "DELETE", "OPTIONS"],
     allow_headers=["*"],
 )
 
