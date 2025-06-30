@@ -1,0 +1,2 @@
+# Railway Web Service Configuration
+web: python start_server.py

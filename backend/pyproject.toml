@@ -1,0 +1,7 @@
+[tool.poetry]
+name = "sp500-predictor-api"
+version = "1.0.0"
+description = "SP500 Prediction API with XGBoost"
+
+[web]
+start = "python start_server.py"
